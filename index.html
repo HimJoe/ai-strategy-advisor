@@ -4,474 +4,489 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Strategy Advisor</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide-react@latest/dist/cjs/lucide-react.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 40px; color: white; }
+        .header h1 { font-size: 3rem; margin-bottom: 10px; }
+        .header p { font-size: 1.2rem; opacity: 0.9; }
+        
+        .card { 
+            background: white; 
+            border-radius: 15px; 
+            padding: 30px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            transition: width 0.3s ease;
+        }
+        
+        .step { margin-bottom: 25px; }
+        .step-label { 
+            font-weight: 600; 
+            font-size: 1.1rem; 
+            margin-bottom: 10px; 
+            color: #374151;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
+        }
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-left: 5px solid #0ea5e9;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .hidden { display: none; }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .step-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s;
+        }
+        .step-dot.active { background: #4f46e5; }
+        .step-dot.completed { background: #10b981; }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Strategy Advisor</h1>
+            <p>Strategic AI Assessment & Implementation Planning</p>
+        </div>
 
-    <script type="text/babel">
-        const { useState } = React;
-        const { ChevronRight, ChevronLeft, Building, Target, BarChart, Map, Shield, Users, RefreshCw, CheckCircle, Download } = LucideReact;
+        <div class="card">
+            <div class="step-indicator">
+                <div class="step-dot active" id="dot-1">1</div>
+                <div class="step-dot" id="dot-2">2</div>
+                <div class="step-dot" id="dot-3">3</div>
+                <div class="step-dot" id="dot-4">4</div>
+                <div class="step-dot" id="dot-5">5</div>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 20%"></div>
+            </div>
 
-        const AIStrategyAdvisor = () => {
-            const [currentStep, setCurrentStep] = useState(0);
-            const [responses, setResponses] = useState({});
-            const [organizationProfile, setOrganizationProfile] = useState({});
-            const [showCanvas, setShowCanvas] = useState(false);
+            <!-- Step 1: Organization Profile -->
+            <div id="step1" class="step-content">
+                <h2>🏢 Organization Profile</h2>
+                <p style="margin-bottom: 20px; color: #6b7280;">Tell us about your organization to customize our recommendations</p>
+                
+                <div class="step">
+                    <label class="step-label">What industry does your organization operate in?</label>
+                    <select class="form-input" id="industry">
+                        <option value="">Select an industry...</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Financial Services">Financial Services</option>
+                        <option value="Manufacturing">Manufacturing</option>
+                        <option value="Retail/E-commerce">Retail/E-commerce</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Professional Services">Professional Services</option>
+                        <option value="Government">Government/Public Sector</option>
+                        <option value="Education">Education</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
 
-            const steps = [
-                { id: 'profile', title: 'Organization Profile', icon: Building, color: 'bg-blue-500' },
-                { id: 'vision', title: 'Vision & Value', icon: Target, color: 'bg-purple-500' },
-                { id: 'alignment', title: 'Business Alignment', icon: BarChart, color: 'bg-green-500' },
-                { id: 'capabilities', title: 'Capabilities', icon: CheckCircle, color: 'bg-orange-500' },
-                { id: 'roadmap', title: 'Roadmap', icon: Map, color: 'bg-indigo-500' },
-                { id: 'risk', title: 'Risk & Governance', icon: Shield, color: 'bg-red-500' },
-                { id: 'change', title: 'Change Management', icon: Users, color: 'bg-teal-500' },
-                { id: 'evaluation', title: 'Evaluation', icon: RefreshCw, color: 'bg-pink-500' }
-            ];
+                <div class="step">
+                    <label class="step-label">What is your organization size?</label>
+                    <select class="form-input" id="size">
+                        <option value="">Select organization size...</option>
+                        <option value="Startup">Startup (< 50 employees)</option>
+                        <option value="SME">SME (50-500 employees)</option>
+                        <option value="Large Enterprise">Large Enterprise (500-5000 employees)</option>
+                        <option value="Global Enterprise">Global Enterprise (5000+ employees)</option>
+                    </select>
+                </div>
 
-            const profileQuestions = [
-                {
-                    id: 'industry',
-                    question: 'What industry does your organization operate in?',
-                    type: 'select',
-                    options: ['Healthcare', 'Financial Services', 'Manufacturing', 'Retail', 'Technology', 'Other']
-                },
-                {
-                    id: 'size',
-                    question: 'What is your organization size?',
-                    type: 'select',
-                    options: ['Startup (<50)', 'SME (50-500)', 'Large Enterprise (500-5000)', 'Global Enterprise (5000+)']
-                },
-                {
-                    id: 'maturity',
-                    question: 'What is your current AI maturity level?',
-                    type: 'select',
-                    options: ['Beginner', 'Intermediate', 'Advanced', 'Leader']
-                },
-                {
-                    id: 'goal',
-                    question: 'What is your primary AI goal?',
-                    type: 'select',
-                    options: ['Cost Optimization', 'Customer Experience', 'Innovation', 'Risk Reduction', 'Efficiency']
-                }
-            ];
+                <div class="step">
+                    <label class="step-label">What is your current AI maturity level?</label>
+                    <select class="form-input" id="maturity">
+                        <option value="">Select maturity level...</option>
+                        <option value="Beginner">Beginner (Exploring AI potential)</option>
+                        <option value="Intermediate">Intermediate (Some pilots/experiments)</option>
+                        <option value="Advanced">Advanced (Strategic AI implementation)</option>
+                        <option value="Leader">Leader (AI-driven business model)</option>
+                    </select>
+                </div>
 
-            const questionSets = {
-                vision: [
-                    {
-                        id: 'innovation_vision',
-                        question: 'How do you envision AI driving innovation?',
-                        type: 'textarea',
-                        placeholder: 'Describe your AI innovation vision...'
-                    }
-                ],
-                alignment: [
-                    {
-                        id: 'business_goals',
-                        question: 'How do AI initiatives support your business goals?',
-                        type: 'textarea',
-                        placeholder: 'Connect AI to business objectives...'
-                    }
-                ],
-                capabilities: [
-                    {
-                        id: 'data_maturity',
-                        question: 'How mature is your data infrastructure?',
-                        type: 'select',
-                        options: ['Basic', 'Developing', 'Mature', 'Advanced']
-                    }
-                ],
-                roadmap: [
-                    {
-                        id: 'first_projects',
-                        question: 'Which AI projects should you tackle first?',
-                        type: 'textarea',
-                        placeholder: 'Describe pilot projects...'
-                    }
-                ],
-                risk: [
-                    {
-                        id: 'ethical_principles',
-                        question: 'What ethical principles guide your AI?',
-                        type: 'textarea',
-                        placeholder: 'Describe ethical considerations...'
-                    }
-                ],
-                change: [
-                    {
-                        id: 'employee_concerns',
-                        question: 'How will you address employee AI concerns?',
-                        type: 'textarea',
-                        placeholder: 'Change management approach...'
-                    }
-                ],
-                evaluation: [
-                    {
-                        id: 'success_metrics',
-                        question: 'What KPIs will track AI success?',
-                        type: 'textarea',
-                        placeholder: 'Success measurement approach...'
-                    }
-                ]
-            };
+                <div class="step">
+                    <label class="step-label">What is your primary AI goal?</label>
+                    <select class="form-input" id="goal">
+                        <option value="">Select primary goal...</option>
+                        <option value="Cost Optimization">Cost Optimization</option>
+                        <option value="Customer Experience">Customer Experience Enhancement</option>
+                        <option value="Innovation">Innovation & New Revenue</option>
+                        <option value="Risk Reduction">Risk Reduction</option>
+                        <option value="Efficiency">Operational Efficiency</option>
+                        <option value="Competitive Advantage">Competitive Advantage</option>
+                    </select>
+                </div>
+            </div>
 
-            const getCurrentQuestions = () => {
-                if (currentStep === 0) return profileQuestions;
-                const stepId = steps[currentStep].id;
-                return questionSets[stepId] || [];
-            };
+            <!-- Step 2: Vision & Value -->
+            <div id="step2" class="step-content hidden">
+                <h2>🎯 Vision & Value Realization</h2>
+                <p style="margin-bottom: 20px; color: #6b7280;">Define your AI vision and value opportunities</p>
+                
+                <div class="step">
+                    <label class="step-label">How do you envision AI driving innovation within your organization?</label>
+                    <textarea class="form-input" rows="4" id="innovation" placeholder="Describe your vision for AI-powered innovation..."></textarea>
+                </div>
 
-            const handleResponse = (questionId, value) => {
-                setResponses(prev => ({ ...prev, [questionId]: value }));
-            };
+                <div class="step">
+                    <label class="step-label">What new business models or revenue streams could AI enable?</label>
+                    <textarea class="form-input" rows="4" id="businessModels" placeholder="Consider new ways AI could create value..."></textarea>
+                </div>
+            </div>
 
-            const handleProfileResponse = (questionId, value) => {
-                setOrganizationProfile(prev => ({ ...prev, [questionId]: value }));
-            };
+            <!-- Step 3: Business Alignment -->
+            <div id="step3" class="step-content hidden">
+                <h2>📊 Business Alignment</h2>
+                <p style="margin-bottom: 20px; color: #6b7280;">Align AI initiatives with business objectives</p>
+                
+                <div class="step">
+                    <label class="step-label">How do AI initiatives support your core business goals?</label>
+                    <textarea class="form-input" rows="4" id="businessGoals" placeholder="Connect AI initiatives to specific business objectives..."></textarea>
+                </div>
 
-            const nextStep = () => {
-                if (currentStep < steps.length - 1) {
-                    setCurrentStep(currentStep + 1);
+                <div class="step">
+                    <label class="step-label">What is your expected ROI timeframe for AI initiatives?</label>
+                    <select class="form-input" id="roiTimeframe">
+                        <option value="">Select timeframe...</option>
+                        <option value="3-6 months">3-6 months</option>
+                        <option value="6-12 months">6-12 months</option>
+                        <option value="1-2 years">1-2 years</option>
+                        <option value="2-3 years">2-3 years</option>
+                        <option value="Long-term">Long-term (3+ years)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Step 4: Current Capabilities -->
+            <div id="step4" class="step-content hidden">
+                <h2>⚡ Current Capabilities</h2>
+                <p style="margin-bottom: 20px; color: #6b7280;">Assess your organization's AI readiness</p>
+                
+                <div class="step">
+                    <label class="step-label">How mature is your existing data infrastructure?</label>
+                    <select class="form-input" id="dataMaturity">
+                        <option value="">Select data maturity level...</option>
+                        <option value="Basic">Basic (Siloed, inconsistent data)</option>
+                        <option value="Developing">Developing (Some integration, basic governance)</option>
+                        <option value="Mature">Mature (Integrated systems, good governance)</option>
+                        <option value="Advanced">Advanced (Real-time, AI-ready data platform)</option>
+                    </select>
+                </div>
+
+                <div class="step">
+                    <label class="step-label">How prepared is your organizational culture for AI-driven change?</label>
+                    <select class="form-input" id="culturalReadiness">
+                        <option value="">Select cultural readiness...</option>
+                        <option value="Highly resistant">Highly resistant to change</option>
+                        <option value="Cautious">Cautious but open</option>
+                        <option value="Moderately adaptive">Moderately adaptive</option>
+                        <option value="Highly adaptive">Highly adaptive</option>
+                        <option value="Change-driven">Change-driven culture</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Step 5: Results -->
+            <div id="step5" class="step-content hidden">
+                <h2>🎉 Your AI Strategy Canvas</h2>
+                <div id="results"></div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn btn-secondary" id="prevBtn" onclick="previousStep()" style="display: none;">⬅ Previous</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">Next ➡</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+        
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Update step indicators
+            for (let i = 1; i <= totalSteps; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i < currentStep) {
+                    dot.className = 'step-dot completed';
+                    dot.textContent = '✓';
+                } else if (i === currentStep) {
+                    dot.className = 'step-dot active';
+                    dot.textContent = i;
                 } else {
-                    setShowCanvas(true);
+                    dot.className = 'step-dot';
+                    dot.textContent = i;
                 }
-            };
-
-            const prevStep = () => {
-                if (currentStep > 0) setCurrentStep(currentStep - 1);
-            };
-
-            const renderInput = (question, isProfile = false) => {
-                const handleChange = isProfile ? handleProfileResponse : handleResponse;
-                const value = isProfile ? organizationProfile[question.id] : responses[question.id];
-
-                if (question.type === 'select') {
-                    return React.createElement('select', {
-                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500",
-                        value: value || '',
-                        onChange: (e) => handleChange(question.id, e.target.value)
-                    }, [
-                        React.createElement('option', { key: 'default', value: '' }, 'Select an option...'),
-                        ...question.options.map(option => 
-                            React.createElement('option', { key: option, value: option }, option)
-                        )
-                    ]);
-                }
-
-                if (question.type === 'textarea') {
-                    return React.createElement('textarea', {
-                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500",
-                        rows: 4,
-                        placeholder: question.placeholder,
-                        value: value || '',
-                        onChange: (e) => handleChange(question.id, e.target.value)
-                    });
-                }
-
-                return React.createElement('input', {
-                    type: 'text',
-                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500",
-                    value: value || '',
-                    onChange: (e) => handleChange(question.id, e.target.value)
-                });
-            };
-
-            const AIStrategyCanvas = () => {
-                return React.createElement('div', {
-                    className: "max-w-6xl mx-auto p-6 bg-white min-h-screen"
-                }, [
-                    React.createElement('div', {
-                        key: 'header',
-                        className: "text-center mb-8"
-                    }, [
-                        React.createElement('h2', {
-                            key: 'title',
-                            className: "text-3xl font-bold text-gray-900 mb-4"
-                        }, '🎯 AI Strategy Canvas'),
-                        React.createElement('p', {
-                            key: 'subtitle',
-                            className: "text-gray-600"
-                        }, `Customized roadmap for ${organizationProfile.industry} organization`)
-                    ]),
-                    
-                    React.createElement('div', {
-                        key: 'content',
-                        className: "grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8"
-                    }, [
-                        React.createElement('div', {
-                            key: 'profile',
-                            className: "bg-blue-50 rounded-lg p-6"
-                        }, [
-                            React.createElement('h3', {
-                                key: 'title',
-                                className: "text-xl font-bold text-blue-900 mb-4"
-                            }, '🏢 Organization Profile'),
-                            React.createElement('div', {
-                                key: 'details',
-                                className: "space-y-2"
-                            }, [
-                                React.createElement('p', { key: 'industry' }, React.createElement('strong', {}, 'Industry: '), organizationProfile.industry),
-                                React.createElement('p', { key: 'size' }, React.createElement('strong', {}, 'Size: '), organizationProfile.size),
-                                React.createElement('p', { key: 'maturity' }, React.createElement('strong', {}, 'AI Maturity: '), organizationProfile.maturity),
-                                React.createElement('p', { key: 'goal' }, React.createElement('strong', {}, 'Primary Goal: '), organizationProfile.goal)
-                            ])
-                        ]),
-                        
-                        React.createElement('div', {
-                            key: 'recommendations',
-                            className: "bg-green-50 rounded-lg p-6"
-                        }, [
-                            React.createElement('h3', {
-                                key: 'title',
-                                className: "text-xl font-bold text-green-900 mb-4"
-                            }, '🎯 Key Recommendations'),
-                            React.createElement('ul', {
-                                key: 'list',
-                                className: "space-y-2"
-                            }, [
-                                React.createElement('li', { key: '1', className: "text-green-700" }, '• Start with AI literacy training'),
-                                React.createElement('li', { key: '2', className: "text-green-700" }, '• Conduct data quality assessment'),
-                                React.createElement('li', { key: '3', className: "text-green-700" }, '• Identify pilot projects'),
-                                React.createElement('li', { key: '4', className: "text-green-700" }, '• Establish governance framework')
-                            ])
-                        ])
-                    ]),
-                    
-                    React.createElement('div', {
-                        key: 'timeline',
-                        className: "bg-purple-50 rounded-lg p-6 mb-8"
-                    }, [
-                        React.createElement('h3', {
-                            key: 'title',
-                            className: "text-xl font-bold text-purple-900 mb-4"
-                        }, '📅 90-Day Timeline'),
-                        React.createElement('div', {
-                            key: 'phases',
-                            className: "grid grid-cols-1 md:grid-cols-3 gap-6"
-                        }, [
-                            React.createElement('div', {
-                                key: 'phase1',
-                                className: "bg-white rounded p-4"
-                            }, [
-                                React.createElement('h4', {
-                                    key: 'title',
-                                    className: "font-bold text-purple-800 mb-2"
-                                }, 'Days 1-30: Foundation'),
-                                React.createElement('ul', {
-                                    key: 'tasks',
-                                    className: "space-y-1 text-sm"
-                                }, [
-                                    React.createElement('li', { key: '1' }, '• Leadership training'),
-                                    React.createElement('li', { key: '2' }, '• Data audit'),
-                                    React.createElement('li', { key: '3' }, '• Governance setup'),
-                                    React.createElement('li', { key: '4' }, '• Project identification')
-                                ])
-                            ]),
-                            React.createElement('div', {
-                                key: 'phase2',
-                                className: "bg-white rounded p-4"
-                            }, [
-                                React.createElement('h4', {
-                                    key: 'title',
-                                    className: "font-bold text-purple-800 mb-2"
-                                }, 'Days 31-60: Building'),
-                                React.createElement('ul', {
-                                    key: 'tasks',
-                                    className: "space-y-1 text-sm"
-                                }, [
-                                    React.createElement('li', { key: '1' }, '• Team formation'),
-                                    React.createElement('li', { key: '2' }, '• Platform preparation'),
-                                    React.createElement('li', { key: '3' }, '• Pilot initiation'),
-                                    React.createElement('li', { key: '4' }, '• Change management')
-                                ])
-                            ]),
-                            React.createElement('div', {
-                                key: 'phase3',
-                                className: "bg-white rounded p-4"
-                            }, [
-                                React.createElement('h4', {
-                                    key: 'title',
-                                    className: "font-bold text-purple-800 mb-2"
-                                }, 'Days 61-90: Execution'),
-                                React.createElement('ul', {
-                                    key: 'tasks',
-                                    className: "space-y-1 text-sm"
-                                }, [
-                                    React.createElement('li', { key: '1' }, '• Pilot delivery'),
-                                    React.createElement('li', { key: '2' }, '• Metrics tracking'),
-                                    React.createElement('li', { key: '3' }, '• Scaling strategy'),
-                                    React.createElement('li', { key: '4' }, '• Next phase planning')
-                                ])
-                            ])
-                        ])
-                    ]),
-                    
-                    React.createElement('div', {
-                        key: 'footer',
-                        className: "text-center mt-8"
-                    }, [
-                        React.createElement('button', {
-                            key: 'download',
-                            className: "bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors",
-                            onClick: () => window.print()
-                        }, '📥 Download Strategy Canvas'),
-                        React.createElement('p', {
-                            key: 'note',
-                            className: "text-gray-500 mt-4"
-                        }, 'Your personalized AI strategy is ready! 🚀')
-                    ])
-                ]);
-            };
-
-            if (showCanvas) {
-                return React.createElement(AIStrategyCanvas);
             }
-
-            const currentQuestions = getCurrentQuestions();
-            const isProfile = currentStep === 0;
-
-            return React.createElement('div', {
-                className: "min-h-screen bg-gray-50"
-            }, [
-                React.createElement('div', {
-                    key: 'container',
-                    className: "max-w-4xl mx-auto p-6"
-                }, [
-                    React.createElement('div', {
-                        key: 'header',
-                        className: "text-center mb-8"
-                    }, [
-                        React.createElement('h1', {
-                            key: 'title',
-                            className: "text-4xl font-bold text-gray-900 mb-2"
-                        }, '🤖 AI Strategy Advisor'),
-                        React.createElement('p', {
-                            key: 'subtitle',
-                            className: "text-xl text-gray-600"
-                        }, 'Strategic AI Assessment & Implementation Planning')
-                    ]),
+        }
+        
+        function showStep(step) {
+            // Hide all steps
+            for (let i = 1; i <= totalSteps; i++) {
+                document.getElementById(`step${i}`).classList.add('hidden');
+            }
+            // Show current step
+            document.getElementById(`step${step}`).classList.remove('hidden');
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').style.display = step > 1 ? 'block' : 'none';
+            document.getElementById('nextBtn').textContent = step === totalSteps ? '🎉 Generate Strategy' : 'Next ➡';
+        }
+        
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+            } else {
+                generateResults();
+                return;
+            }
+            
+            showStep(currentStep);
+            updateProgress();
+        }
+        
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+            }
+            
+            showStep(currentStep);
+            updateProgress();
+        }
+        
+        function generateResults() {
+            const industry = document.getElementById('industry').value;
+            const size = document.getElementById('size').value;
+            const maturity = document.getElementById('maturity').value;
+            const goal = document.getElementById('goal').value;
+            const innovation = document.getElementById('innovation').value;
+            const businessModels = document.getElementById('businessModels').value;
+            const businessGoals = document.getElementById('businessGoals').value;
+            const roiTimeframe = document.getElementById('roiTimeframe').value;
+            const dataMaturity = document.getElementById('dataMaturity').value;
+            const culturalReadiness = document.getElementById('culturalReadiness').value;
+            
+            let recommendations = [];
+            
+            // Generate recommendations based on maturity
+            if (maturity === 'Beginner') {
+                recommendations = [
+                    'Start with AI literacy training for leadership team',
+                    'Conduct comprehensive data audit and quality assessment',
+                    'Identify 2-3 low-risk, high-visibility pilot projects',
+                    'Establish AI governance principles and ethics guidelines'
+                ];
+            } else if (maturity === 'Intermediate') {
+                recommendations = [
+                    'Develop centers of excellence for AI implementation',
+                    'Create standardized AI project methodology',
+                    'Invest in data platform modernization',
+                    'Build internal AI capability through targeted hiring'
+                ];
+            } else {
+                recommendations = [
+                    'Scale successful AI pilots across the organization',
+                    'Implement advanced AI governance frameworks',
+                    'Drive AI-powered business model innovation',
+                    'Establish AI leadership in your industry'
+                ];
+            }
+            
+            // Generate industry-specific recommendations
+            let industryRecs = [];
+            if (industry === 'Healthcare') {
+                industryRecs = [
+                    'Prioritize patient privacy and HIPAA compliance',
+                    'Focus on clinical decision support systems',
+                    'Consider AI for medical imaging and diagnostics',
+                    'Implement AI-powered patient engagement tools'
+                ];
+            } else if (industry === 'Financial Services') {
+                industryRecs = [
+                    'Implement fraud detection and risk management AI',
+                    'Explore robo-advisory and personalized services',
+                    'Ensure regulatory compliance (Basel III, GDPR)',
+                    'Develop algorithmic trading capabilities'
+                ];
+            } else if (industry === 'Manufacturing') {
+                industryRecs = [
+                    'Deploy predictive maintenance systems',
+                    'Implement quality control automation',
+                    'Optimize supply chain with AI forecasting',
+                    'Enhance production efficiency with AI'
+                ];
+            } else {
+                industryRecs = [
+                    'Automate routine processes and workflows',
+                    'Implement intelligent customer service systems',
+                    'Use AI for data-driven decision making',
+                    'Develop personalized customer experiences'
+                ];
+            }
+            
+            const resultsHTML = `
+                <div class="result-card">
+                    <h3>🏢 Organization Profile</h3>
+                    <p><strong>Industry:</strong> ${industry}</p>
+                    <p><strong>Size:</strong> ${size}</p>
+                    <p><strong>AI Maturity:</strong> ${maturity}</p>
+                    <p><strong>Primary Goal:</strong> ${goal}</p>
+                </div>
+                
+                <div class="result-card">
+                    <h3>🎯 Key Recommendations</h3>
+                    <h4>General Strategy:</h4>
+                    <ul>
+                        ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                    <h4>${industry} Specific:</h4>
+                    <ul>
+                        ${industryRecs.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="result-card">
+                    <h3>📅 90-Day Implementation Timeline</h3>
+                    <h4>Days 1-30: Foundation</h4>
+                    <ul>
+                        <li>Leadership AI literacy training</li>
+                        <li>Data audit and quality assessment</li>
+                        <li>Governance framework establishment</li>
+                        <li>Pilot project identification</li>
+                    </ul>
                     
-                    React.createElement('div', {
-                        key: 'progress',
-                        className: "mb-8"
-                    }, [
-                        React.createElement('div', {
-                            key: 'steps',
-                            className: "flex items-center justify-between mb-4"
-                        }, steps.map((step, index) => {
-                            const Icon = step.icon;
-                            const isActive = index === currentStep;
-                            const isCompleted = index < currentStep;
-                            
-                            return React.createElement('div', {
-                                key: step.id,
-                                className: "flex flex-col items-center"
-                            }, [
-                                React.createElement('div', {
-                                    key: 'icon',
-                                    className: `w-12 h-12 rounded-full flex items-center justify-center text-white mb-2 ${
-                                        isActive ? step.color : 
-                                        isCompleted ? 'bg-green-500' : 'bg-gray-300'
-                                    }`
-                                }, React.createElement(Icon, { size: 20 })),
-                                React.createElement('span', {
-                                    key: 'label',
-                                    className: `text-xs text-center ${
-                                        isActive ? 'text-gray-900 font-semibold' : 'text-gray-500'
-                                    }`
-                                }, step.title)
-                            ]);
-                        })),
-                        React.createElement('div', {
-                            key: 'bar',
-                            className: "w-full bg-gray-200 rounded-full h-2"
-                        }, [
-                            React.createElement('div', {
-                                key: 'progress',
-                                className: "bg-blue-600 h-2 rounded-full transition-all duration-300",
-                                style: { width: `${(currentStep / (steps.length - 1)) * 100}%` }
-                            })
-                        ])
-                    ]),
+                    <h4>Days 31-60: Building</h4>
+                    <ul>
+                        <li>Team formation and training</li>
+                        <li>Data platform preparation</li>
+                        <li>Pilot project initiation</li>
+                        <li>Change management rollout</li>
+                    </ul>
                     
-                    React.createElement('div', {
-                        key: 'content',
-                        className: "bg-white rounded-lg shadow-lg p-8"
-                    }, [
-                        React.createElement('div', {
-                            key: 'header',
-                            className: "mb-6"
-                        }, [
-                            React.createElement('h2', {
-                                key: 'title',
-                                className: "text-2xl font-bold text-gray-900 mb-2"
-                            }, isProfile ? '🏢 Organization Profile' : `${steps[currentStep].title}`),
-                            React.createElement('p', {
-                                key: 'description',
-                                className: "text-gray-600"
-                            }, isProfile 
-                                ? 'Tell us about your organization to customize recommendations'
-                                : `Answer questions to assess your ${steps[currentStep].title.toLowerCase()}`)
-                        ]),
-                        
-                        React.createElement('div', {
-                            key: 'questions',
-                            className: "space-y-6"
-                        }, currentQuestions.map(question => 
-                            React.createElement('div', {
-                                key: question.id,
-                                className: "border-b border-gray-200 pb-6"
-                            }, [
-                                React.createElement('label', {
-                                    key: 'label',
-                                    className: "block text-lg font-medium text-gray-900 mb-3"
-                                }, question.question),
-                                renderInput(question, isProfile)
-                            ])
-                        )),
-                        
-                        React.createElement('div', {
-                            key: 'navigation',
-                            className: "flex justify-between mt-8"
-                        }, [
-                            React.createElement('button', {
-                                key: 'prev',
-                                onClick: prevStep,
-                                disabled: currentStep === 0,
-                                className: "flex items-center px-6 py-3 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            }, [
-                                React.createElement(ChevronLeft, { key: 'icon', className: "mr-2", size: 20 }),
-                                'Previous'
-                            ]),
-                            
-                            React.createElement('button', {
-                                key: 'next',
-                                onClick: nextStep,
-                                className: "flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                            }, [
-                                currentStep === steps.length - 1 ? 'Generate Strategy Canvas' : 'Next',
-                                React.createElement(ChevronRight, { key: 'icon', className: "ml-2", size: 20 })
-                            ])
-                        ])
-                    ]),
+                    <h4>Days 61-90: Execution</h4>
+                    <ul>
+                        <li>Pilot project delivery</li>
+                        <li>Success metrics tracking</li>
+                        <li>Scaling strategy development</li>
+                        <li>Next phase planning</li>
+                    </ul>
+                </div>
+                
+                <div class="result-card">
+                    <h3>🚀 Immediate Next Steps</h3>
+                    <h4>Week 1 Priorities:</h4>
+                    <ul>
+                        <li>Schedule leadership alignment meeting</li>
+                        <li>Initiate data audit process</li>
+                        <li>Define AI governance committee</li>
+                        <li>Identify pilot project sponsors</li>
+                    </ul>
                     
-                    React.createElement('div', {
-                        key: 'footer',
-                        className: "mt-6 text-center text-gray-500"
-                    }, `Step ${currentStep + 1} of ${steps.length} • Estimated time: ${currentStep === 0 ? '2' : '5-10'} minutes`)
-                ])
-            ]);
-        };
-
-        ReactDOM.render(React.createElement(AIStrategyAdvisor), document.getElementById('root'));
+                    <h4>Resource Requirements:</h4>
+                    <ul>
+                        <li>Executive sponsor commitment</li>
+                        <li>Cross-functional project team</li>
+                        <li>Initial budget allocation</li>
+                        <li>External advisor consideration</li>
+                    </ul>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-primary" onclick="window.print()">📥 Download Strategy Canvas</button>
+                    <p style="margin-top: 15px; color: #6b7280;">Your personalized AI strategy is ready! 🎉</p>
+                </div>
+            `;
+            
+            document.getElementById('results').innerHTML = resultsHTML;
+            currentStep = 5;
+            showStep(currentStep);
+            updateProgress();
+        }
+        
+        // Initialize
+        updateProgress();
     </script>
 </body>
 </html>

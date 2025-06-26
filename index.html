@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Strategy Advisor</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/cjs/lucide-react.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+        const { ChevronRight, ChevronLeft, Building, Target, BarChart, Map, Shield, Users, RefreshCw, CheckCircle, Download } = LucideReact;
+
+        const AIStrategyAdvisor = () => {
+            const [currentStep, setCurrentStep] = useState(0);
+            const [responses, setResponses] = useState({});
+            const [organizationProfile, setOrganizationProfile] = useState({});
+            const [showCanvas, setShowCanvas] = useState(false);
+
+            const steps = [
+                { id: 'profile', title: 'Organization Profile', icon: Building, color: 'bg-blue-500' },
+                { id: 'vision', title: 'Vision & Value', icon: Target, color: 'bg-purple-500' },
+                { id: 'alignment', title: 'Business Alignment', icon: BarChart, color: 'bg-green-500' },
+                { id: 'capabilities', title: 'Capabilities', icon: CheckCircle, color: 'bg-orange-500' },
+                { id: 'roadmap', title: 'Roadmap', icon: Map, color: 'bg-indigo-500' },
+                { id: 'risk', title: 'Risk & Governance', icon: Shield, color: 'bg-red-500' },
+                { id: 'change', title: 'Change Management', icon: Users, color: 'bg-teal-500' },
+                { id: 'evaluation', title: 'Evaluation', icon: RefreshCw, color: 'bg-pink-500' }
+            ];
+
+            const profileQuestions = [
+                {
+                    id: 'industry',
+                    question: 'What industry does your organization operate in?',
+                    type: 'select',
+                    options: ['Healthcare', 'Financial Services', 'Manufacturing', 'Retail', 'Technology', 'Other']
+                },
+                {
+                    id: 'size',
+                    question: 'What is your organization size?',
+                    type: 'select',
+                    options: ['Startup (<50)', 'SME (50-500)', 'Large Enterprise (500-5000)', 'Global Enterprise (5000+)']
+                },
+                {
+                    id: 'maturity',
+                    question: 'What is your current AI maturity level?',
+                    type: 'select',
+                    options: ['Beginner', 'Intermediate', 'Advanced', 'Leader']
+                },
+                {
+                    id: 'goal',
+                    question: 'What is your primary AI goal?',
+                    type: 'select',
+                    options: ['Cost Optimization', 'Customer Experience', 'Innovation', 'Risk Reduction', 'Efficiency']
+                }
+            ];
+
+            const questionSets = {
+                vision: [
+                    {
+                        id: 'innovation_vision',
+                        question: 'How do you envision AI driving innovation?',
+                        type: 'textarea',
+                        placeholder: 'Describe your AI innovation vision...'
+                    }
+                ],
+                alignment: [
+                    {
+                        id: 'business_goals',
+                        question: 'How do AI initiatives support your business goals?',
+                        type: 'textarea',
+                        placeholder: 'Connect AI to business objectives...'
+                    }
+                ],
+                capabilities: [
+                    {
+                        id: 'data_maturity',
+                        question: 'How mature is your data infrastructure?',
+                        type: 'select',
+                        options: ['Basic', 'Developing', 'Mature', 'Advanced']
+                    }
+                ],
+                roadmap: [
+                    {
+                        id: 'first_projects',
+                        question: 'Which AI projects should you tackle first?',
+                        type: 'textarea',
+                        placeholder: 'Describe pilot projects...'
+                    }
+                ],
+                risk: [
+                    {
+                        id: 'ethical_principles',
+                        question: 'What ethical principles guide your AI?',
+                        type: 'textarea',
+                        placeholder: 'Describe ethical considerations...'
+                    }
+                ],
+                change: [
+                    {
+                        id: 'employee_concerns',
+                        question: 'How will you address employee AI concerns?',
+                        type: 'textarea',
+                        placeholder: 'Change management approach...'
+                    }
+                ],
+                evaluation: [
+                    {
+                        id: 'success_metrics',
+                        question: 'What KPIs will track AI success?',
+                        type: 'textarea',
+                        placeholder: 'Success measurement approach...'
+                    }
+                ]
+            };
+
+            const getCurrentQuestions = () => {
+                if (currentStep === 0) return profileQuestions;
+                const stepId = steps[currentStep].id;
+                return questionSets[stepId] || [];
+            };
+
+            const handleResponse = (questionId, value) => {
+                setResponses(prev => ({ ...prev, [questionId]: value }));
+            };
+
+            const handleProfileResponse = (questionId, value) => {
+                setOrganizationProfile(prev => ({ ...prev, [questionId]: value }));
+            };
+
+            const nextStep = () => {
+                if (currentStep < steps.length - 1) {
+                    setCurrentStep(currentStep + 1);
+                } else {
+                    setShowCanvas(true);
+                }
+            };
+
+            const prevStep = () => {
+                if (currentStep > 0) setCurrentStep(currentStep - 1);
+            };
+
+            const renderInput = (question, isProfile = false) => {
+                const handleChange = isProfile ? handleProfileResponse : handleResponse;
+                const value = isProfile ? organizationProfile[question.id] : responses[question.id];
+
+                if (question.type === 'select') {
+                    return React.createElement('select', {
+                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500",
+                        value: value || '',
+                        onChange: (e) => handleChange(question.id, e.target.value)
+                    }, [
+                        React.createElement('option', { key: 'default', value: '' }, 'Select an option...'),
+                        ...question.options.map(option => 
+                            React.createElement('option', { key: option, value: option }, option)
+                        )
+                    ]);
+                }
+
+                if (question.type === 'textarea') {
+                    return React.createElement('textarea', {
+                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500",
+                        rows: 4,
+                        placeholder: question.placeholder,
+                        value: value || '',
+                        onChange: (e) => handleChange(question.id, e.target.value)
+                    });
+                }
+
+                return React.createElement('input', {
+                    type: 'text',
+                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500",
+                    value: value || '',
+                    onChange: (e) => handleChange(question.id, e.target.value)
+                });
+            };
+
+            const AIStrategyCanvas = () => {
+                return React.createElement('div', {
+                    className: "max-w-6xl mx-auto p-6 bg-white min-h-screen"
+                }, [
+                    React.createElement('div', {
+                        key: 'header',
+                        className: "text-center mb-8"
+                    }, [
+                        React.createElement('h2', {
+                            key: 'title',
+                            className: "text-3xl font-bold text-gray-900 mb-4"
+                        }, '🎯 AI Strategy Canvas'),
+                        React.createElement('p', {
+                            key: 'subtitle',
+                            className: "text-gray-600"
+                        }, `Customized roadmap for ${organizationProfile.industry} organization`)
+                    ]),
+                    
+                    React.createElement('div', {
+                        key: 'content',
+                        className: "grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8"
+                    }, [
+                        React.createElement('div', {
+                            key: 'profile',
+                            className: "bg-blue-50 rounded-lg p-6"
+                        }, [
+                            React.createElement('h3', {
+                                key: 'title',
+                                className: "text-xl font-bold text-blue-900 mb-4"
+                            }, '🏢 Organization Profile'),
+                            React.createElement('div', {
+                                key: 'details',
+                                className: "space-y-2"
+                            }, [
+                                React.createElement('p', { key: 'industry' }, React.createElement('strong', {}, 'Industry: '), organizationProfile.industry),
+                                React.createElement('p', { key: 'size' }, React.createElement('strong', {}, 'Size: '), organizationProfile.size),
+                                React.createElement('p', { key: 'maturity' }, React.createElement('strong', {}, 'AI Maturity: '), organizationProfile.maturity),
+                                React.createElement('p', { key: 'goal' }, React.createElement('strong', {}, 'Primary Goal: '), organizationProfile.goal)
+                            ])
+                        ]),
+                        
+                        React.createElement('div', {
+                            key: 'recommendations',
+                            className: "bg-green-50 rounded-lg p-6"
+                        }, [
+                            React.createElement('h3', {
+                                key: 'title',
+                                className: "text-xl font-bold text-green-900 mb-4"
+                            }, '🎯 Key Recommendations'),
+                            React.createElement('ul', {
+                                key: 'list',
+                                className: "space-y-2"
+                            }, [
+                                React.createElement('li', { key: '1', className: "text-green-700" }, '• Start with AI literacy training'),
+                                React.createElement('li', { key: '2', className: "text-green-700" }, '• Conduct data quality assessment'),
+                                React.createElement('li', { key: '3', className: "text-green-700" }, '• Identify pilot projects'),
+                                React.createElement('li', { key: '4', className: "text-green-700" }, '• Establish governance framework')
+                            ])
+                        ])
+                    ]),
+                    
+                    React.createElement('div', {
+                        key: 'timeline',
+                        className: "bg-purple-50 rounded-lg p-6 mb-8"
+                    }, [
+                        React.createElement('h3', {
+                            key: 'title',
+                            className: "text-xl font-bold text-purple-900 mb-4"
+                        }, '📅 90-Day Timeline'),
+                        React.createElement('div', {
+                            key: 'phases',
+                            className: "grid grid-cols-1 md:grid-cols-3 gap-6"
+                        }, [
+                            React.createElement('div', {
+                                key: 'phase1',
+                                className: "bg-white rounded p-4"
+                            }, [
+                                React.createElement('h4', {
+                                    key: 'title',
+                                    className: "font-bold text-purple-800 mb-2"
+                                }, 'Days 1-30: Foundation'),
+                                React.createElement('ul', {
+                                    key: 'tasks',
+                                    className: "space-y-1 text-sm"
+                                }, [
+                                    React.createElement('li', { key: '1' }, '• Leadership training'),
+                                    React.createElement('li', { key: '2' }, '• Data audit'),
+                                    React.createElement('li', { key: '3' }, '• Governance setup'),
+                                    React.createElement('li', { key: '4' }, '• Project identification')
+                                ])
+                            ]),
+                            React.createElement('div', {
+                                key: 'phase2',
+                                className: "bg-white rounded p-4"
+                            }, [
+                                React.createElement('h4', {
+                                    key: 'title',
+                                    className: "font-bold text-purple-800 mb-2"
+                                }, 'Days 31-60: Building'),
+                                React.createElement('ul', {
+                                    key: 'tasks',
+                                    className: "space-y-1 text-sm"
+                                }, [
+                                    React.createElement('li', { key: '1' }, '• Team formation'),
+                                    React.createElement('li', { key: '2' }, '• Platform preparation'),
+                                    React.createElement('li', { key: '3' }, '• Pilot initiation'),
+                                    React.createElement('li', { key: '4' }, '• Change management')
+                                ])
+                            ]),
+                            React.createElement('div', {
+                                key: 'phase3',
+                                className: "bg-white rounded p-4"
+                            }, [
+                                React.createElement('h4', {
+                                    key: 'title',
+                                    className: "font-bold text-purple-800 mb-2"
+                                }, 'Days 61-90: Execution'),
+                                React.createElement('ul', {
+                                    key: 'tasks',
+                                    className: "space-y-1 text-sm"
+                                }, [
+                                    React.createElement('li', { key: '1' }, '• Pilot delivery'),
+                                    React.createElement('li', { key: '2' }, '• Metrics tracking'),
+                                    React.createElement('li', { key: '3' }, '• Scaling strategy'),
+                                    React.createElement('li', { key: '4' }, '• Next phase planning')
+                                ])
+                            ])
+                        ])
+                    ]),
+                    
+                    React.createElement('div', {
+                        key: 'footer',
+                        className: "text-center mt-8"
+                    }, [
+                        React.createElement('button', {
+                            key: 'download',
+                            className: "bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors",
+                            onClick: () => window.print()
+                        }, '📥 Download Strategy Canvas'),
+                        React.createElement('p', {
+                            key: 'note',
+                            className: "text-gray-500 mt-4"
+                        }, 'Your personalized AI strategy is ready! 🚀')
+                    ])
+                ]);
+            };
+
+            if (showCanvas) {
+                return React.createElement(AIStrategyCanvas);
+            }
+
+            const currentQuestions = getCurrentQuestions();
+            const isProfile = currentStep === 0;
+
+            return React.createElement('div', {
+                className: "min-h-screen bg-gray-50"
+            }, [
+                React.createElement('div', {
+                    key: 'container',
+                    className: "max-w-4xl mx-auto p-6"
+                }, [
+                    React.createElement('div', {
+                        key: 'header',
+                        className: "text-center mb-8"
+                    }, [
+                        React.createElement('h1', {
+                            key: 'title',
+                            className: "text-4xl font-bold text-gray-900 mb-2"
+                        }, '🤖 AI Strategy Advisor'),
+                        React.createElement('p', {
+                            key: 'subtitle',
+                            className: "text-xl text-gray-600"
+                        }, 'Strategic AI Assessment & Implementation Planning')
+                    ]),
+                    
+                    React.createElement('div', {
+                        key: 'progress',
+                        className: "mb-8"
+                    }, [
+                        React.createElement('div', {
+                            key: 'steps',
+                            className: "flex items-center justify-between mb-4"
+                        }, steps.map((step, index) => {
+                            const Icon = step.icon;
+                            const isActive = index === currentStep;
+                            const isCompleted = index < currentStep;
+                            
+                            return React.createElement('div', {
+                                key: step.id,
+                                className: "flex flex-col items-center"
+                            }, [
+                                React.createElement('div', {
+                                    key: 'icon',
+                                    className: `w-12 h-12 rounded-full flex items-center justify-center text-white mb-2 ${
+                                        isActive ? step.color : 
+                                        isCompleted ? 'bg-green-500' : 'bg-gray-300'
+                                    }`
+                                }, React.createElement(Icon, { size: 20 })),
+                                React.createElement('span', {
+                                    key: 'label',
+                                    className: `text-xs text-center ${
+                                        isActive ? 'text-gray-900 font-semibold' : 'text-gray-500'
+                                    }`
+                                }, step.title)
+                            ]);
+                        })),
+                        React.createElement('div', {
+                            key: 'bar',
+                            className: "w-full bg-gray-200 rounded-full h-2"
+                        }, [
+                            React.createElement('div', {
+                                key: 'progress',
+                                className: "bg-blue-600 h-2 rounded-full transition-all duration-300",
+                                style: { width: `${(currentStep / (steps.length - 1)) * 100}%` }
+                            })
+                        ])
+                    ]),
+                    
+                    React.createElement('div', {
+                        key: 'content',
+                        className: "bg-white rounded-lg shadow-lg p-8"
+                    }, [
+                        React.createElement('div', {
+                            key: 'header',
+                            className: "mb-6"
+                        }, [
+                            React.createElement('h2', {
+                                key: 'title',
+                                className: "text-2xl font-bold text-gray-900 mb-2"
+                            }, isProfile ? '🏢 Organization Profile' : `${steps[currentStep].title}`),
+                            React.createElement('p', {
+                                key: 'description',
+                                className: "text-gray-600"
+                            }, isProfile 
+                                ? 'Tell us about your organization to customize recommendations'
+                                : `Answer questions to assess your ${steps[currentStep].title.toLowerCase()}`)
+                        ]),
+                        
+                        React.createElement('div', {
+                            key: 'questions',
+                            className: "space-y-6"
+                        }, currentQuestions.map(question => 
+                            React.createElement('div', {
+                                key: question.id,
+                                className: "border-b border-gray-200 pb-6"
+                            }, [
+                                React.createElement('label', {
+                                    key: 'label',
+                                    className: "block text-lg font-medium text-gray-900 mb-3"
+                                }, question.question),
+                                renderInput(question, isProfile)
+                            ])
+                        )),
+                        
+                        React.createElement('div', {
+                            key: 'navigation',
+                            className: "flex justify-between mt-8"
+                        }, [
+                            React.createElement('button', {
+                                key: 'prev',
+                                onClick: prevStep,
+                                disabled: currentStep === 0,
+                                className: "flex items-center px-6 py-3 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            }, [
+                                React.createElement(ChevronLeft, { key: 'icon', className: "mr-2", size: 20 }),
+                                'Previous'
+                            ]),
+                            
+                            React.createElement('button', {
+                                key: 'next',
+                                onClick: nextStep,
+                                className: "flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            }, [
+                                currentStep === steps.length - 1 ? 'Generate Strategy Canvas' : 'Next',
+                                React.createElement(ChevronRight, { key: 'icon', className: "ml-2", size: 20 })
+                            ])
+                        ])
+                    ]),
+                    
+                    React.createElement('div', {
+                        key: 'footer',
+                        className: "mt-6 text-center text-gray-500"
+                    }, `Step ${currentStep + 1} of ${steps.length} • Estimated time: ${currentStep === 0 ? '2' : '5-10'} minutes`)
+                ])
+            ]);
+        };
+
+        ReactDOM.render(React.createElement(AIStrategyAdvisor), document.getElementById('root'));
+    </script>
+</body>
+</html>

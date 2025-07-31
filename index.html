@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Himanshu Joshi">
+    <meta name="description" content="Strategic AI Assessment & Implementation Planning Tool">
     <title>AI Strategy Advisor</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -16,6 +18,20 @@
         .header { text-align: center; margin-bottom: 40px; color: white; }
         .header h1 { font-size: 3rem; margin-bottom: 10px; }
         .header p { font-size: 1.2rem; opacity: 0.9; }
+        .header .author-info { 
+            font-size: 0.9rem; 
+            opacity: 0.8; 
+            margin-top: 15px; 
+        }
+        .header .author-info a { 
+            color: white; 
+            text-decoration: none; 
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            transition: border-color 0.3s;
+        }
+        .header .author-info a:hover { 
+            border-color: white; 
+        }
         
         .card { 
             background: white; 
@@ -118,13 +134,42 @@
         }
         .step-dot.active { background: #4f46e5; }
         .step-dot.completed { background: #10b981; }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            opacity: 0.8;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        .footer a {
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            transition: border-color 0.3s;
+        }
+        .footer a:hover {
+            border-color: white;
+        }
     </style>
 </head>
 <body>
+    <!-- 
+    AI Strategy Advisor Tool
+    Created by: Himanshu Joshi
+    GitHub: https://github.com/HimJoe
+    Copyright © 2025 Himanshu Joshi. All rights reserved.
+    -->
+    
     <div class="container">
         <div class="header">
             <h1>🤖 AI Strategy Advisor</h1>
             <p>Strategic AI Assessment & Implementation Planning</p>
+            <div class="author-info">
+                Created by <strong>Himanshu Joshi</strong> | 
+                <a href="https://github.com/HimJoe" target="_blank" rel="noopener">GitHub Profile</a>
+            </div>
         </div>
 
         <div class="card">
@@ -276,6 +321,14 @@
                 <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">Next ➡</button>
             </div>
         </div>
+        
+        <div class="footer">
+            <p>© 2025 <strong>Himanshu Joshi</strong>. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="https://github.com/HimJoe" target="_blank" rel="noopener">🔗 View on GitHub</a> | 
+                Built with ❤️ for Agentic AI Solutions
+            </p>
+        </div>
     </div>
 
     <script>
@@ -343,7 +396,7 @@
             const goal = document.getElementById('goal').value;
             const innovation = document.getElementById('innovation').value;
             const businessModels = document.getElementById('businessModels').value;
-            const businessGoals = document.getElementById('businessGoals').value;
+            const businessGoals = document.getElementById('businessGo als').value;
             const roiTimeframe = document.getElementById('roiTimeframe').value;
             const dataMaturity = document.getElementById('dataMaturity').value;
             const culturalReadiness = document.getElementById('culturalReadiness').value;
@@ -476,6 +529,10 @@
                 <div style="text-align: center; margin-top: 30px;">
                     <button class="btn btn-primary" onclick="window.print()">📥 Download Strategy Canvas</button>
                     <p style="margin-top: 15px; color: #6b7280;">Your personalized AI strategy is ready! 🎉</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem; color: #9ca3af;">
+                        Created by <strong>Himanshu Joshi</strong> | 
+                        <a href="https://github.com/HimJoe" target="_blank" style="color: #4f46e5;">GitHub</a>
+                    </p>
                 </div>
             `;
             
@@ -487,6 +544,12 @@
         
         // Initialize
         updateProgress();
+        
+        // Log creator info to console
+        console.log('%c🚀 AI Strategy Advisor Tool', 'color: #4f46e5; font-size: 16px; font-weight: bold;');
+        console.log('%cCreated by: Himanshu Joshi', 'color: #7c3aed; font-size: 14px;');
+        console.log('%cGitHub: https://github.com/HimJoe', 'color: #059669; font-size: 12px;');
+        console.log('%c© 2025 All rights reserved', 'color: #6b7280; font-size: 12px;');
     </script>
 </body>
 </html>
